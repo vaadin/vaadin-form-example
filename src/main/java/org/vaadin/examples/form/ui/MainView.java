@@ -39,6 +39,11 @@ public class MainView extends VerticalLayout {
     private BeanValidationBinder<UserDetails> binder;
 
     /**
+     * Flag for disabling first run for password validation
+     */
+    private boolean enablePasswordValidation;
+
+    /**
      * We use Spring to inject the backend into our view.
      */
     public MainView(@Autowired UserDetailsService service) {
@@ -110,7 +115,10 @@ public class MainView extends VerticalLayout {
 
         // The second field is not connected to the Binder, but we want the binder to
         // re-check the password validator when the field value changes.
-        passwordField2.addValueChangeListener(e -> binder.validate());
+        passwordField2.addValueChangeListener(e -> {
+            enablePasswordValidation = true;
+            binder.validate();
+        });
 
         // A label where bean-level error messages go
         binder.setStatusLabel(errorMessage);
@@ -180,6 +188,12 @@ public class MainView extends VerticalLayout {
          */
         if (pass1 == null || pass1.length() < 8) {
             return ValidationResult.error("Password should be at least 8 characters long");
+        }
+
+        if (!enablePasswordValidation) {
+            // user hasn't visited the field yet, so don't validate just yet, but next time.
+            enablePasswordValidation = true;
+            return ValidationResult.ok();
         }
 
         String pass2 = passwordField2.getValue();
