@@ -9,6 +9,7 @@ import org.vaadin.examples.form.ui.components.AvatarField;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -56,13 +57,15 @@ public class MainView extends VerticalLayout {
          */
         TextField firstnameField = new TextField("First name");
         TextField lastnameField = new TextField("Last name");
-        TextField handleField = new TextField("Wanted username");
+        TextField handleField = new TextField("User handle");
 
         AvatarField avatarField = new AvatarField("Select Avatar image");
 
         allowMarketingBox = new Checkbox("Allow Marketing?");
         EmailField emailField = new EmailField("Email");
-        emailField.setVisible(false);
+        // We'll use 'visibility' instead of 'display:none' so that the form doesn't
+        // jump around when we hide/show the field
+        emailField.getStyle().set("visibility", "hidden");
 
         passwordField1 = new PasswordField("Wanted password");
         passwordField2 = new PasswordField("Password again");
@@ -75,7 +78,34 @@ public class MainView extends VerticalLayout {
         /*
          * Build the visible layout
          */
-        add(firstnameField, lastnameField, handleField, avatarField, allowMarketingBox, emailField, passwordField1, passwordField2, errorMessage, submitButton);
+
+        // Create a FormLayout with all our components. The FormLayout doesn't have any
+        // logic (validation, etc.), but it allows us to configure Responsiveness from
+        // Java code and its defaults looks nicer than just using a VerticalLayout.
+        FormLayout formLayout = new FormLayout(firstnameField, lastnameField, handleField, avatarField, allowMarketingBox, emailField, passwordField1,
+                passwordField2, errorMessage, submitButton);
+
+        // restrict maximum width and center on page
+        formLayout.setMaxWidth("500px");
+        formLayout.getStyle().set("margin", "0 auto");
+
+        // allow the form layout to be responsive. On device widths 0-490px we have one
+        // column, then we have two. Field labels are always on top of the fields.
+        formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP),
+                new FormLayout.ResponsiveStep("490px", 2, FormLayout.ResponsiveStep.LabelsPosition.TOP));
+
+        // These components take full width regardless if we use one column or two (just
+        // looks better that way)
+        formLayout.setColspan(avatarField, 2);
+        formLayout.setColspan(errorMessage, 2);
+        formLayout.setColspan(submitButton, 2);
+
+        // Add some styles to the error message to make it pop out
+        errorMessage.getStyle().set("color", "var(--lumo-error-text-color)");
+        errorMessage.getStyle().set("padding", "15px 0");
+
+        // add the form to the page
+        add(formLayout);
 
         /*
          * Set up form functionality
@@ -111,7 +141,7 @@ public class MainView extends VerticalLayout {
 
         // Only ask for email address if the user wants marketing emails
         allowMarketingBox.addValueChangeListener(e -> {
-            emailField.setVisible(allowMarketingBox.getValue());
+            emailField.getStyle().set("visibility", allowMarketingBox.getValue() ? "visible" : "hidden");
             // Remove the input if the user decides not to allow emails. This way any input
             // won't end up in the bean when saved.
             if (!allowMarketingBox.getValue()) {
@@ -236,7 +266,7 @@ public class MainView extends VerticalLayout {
      * validation. This way, the validation is only performed when the user has told
      * us they want marketing emails.
      */
-    public static class VisibilityEmailValidator extends EmailValidator {
+    public class VisibilityEmailValidator extends EmailValidator {
 
         public VisibilityEmailValidator(String errorMessage) {
             super(errorMessage);
@@ -245,7 +275,7 @@ public class MainView extends VerticalLayout {
         @Override
         public ValidationResult apply(String value, ValueContext context) {
 
-            if (!context.getComponent().get().isVisible()) {
+            if (!allowMarketingBox.getValue()) {
                 // Component not visible, no validation
                 return ValidationResult.ok();
             } else {

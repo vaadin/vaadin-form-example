@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import org.vaadin.examples.form.data.AvatarImage;
 
 import com.vaadin.flow.component.customfield.CustomField;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.upload.SucceededEvent;
 import com.vaadin.flow.component.upload.Upload;
@@ -45,11 +46,12 @@ public class AvatarField extends CustomField<AvatarImage> {
         currentAvatar = new Image();
         currentAvatar.setAlt("avatar image");
         currentAvatar.setMaxHeight("100px");
+        currentAvatar.getStyle().set("margin-right", "15px");
         currentAvatar.setVisible(false); // see updateImage()
-        add(currentAvatar);
 
         // Create the upload component and delegate actions to the receiveUpload method
         upload = new Upload(this::receiveUpload);
+        upload.getStyle().set("flex-grow", "1");
 
         // listen to state changes
         upload.addSucceededListener(e -> uploadSuccess(e));
@@ -66,7 +68,10 @@ public class AvatarField extends CustomField<AvatarImage> {
         // set max file size to 1 MB
         upload.setMaxFileSize(1 * 1024 * 1024);
 
-        add(upload);
+        Div wrapper = new Div();
+        wrapper.add(currentAvatar, upload);
+        wrapper.getStyle().set("display", "flex");
+        add(wrapper);
     }
 
     private void setFailed(String message) {
