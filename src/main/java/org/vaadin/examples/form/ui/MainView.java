@@ -20,6 +20,7 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.ValueContext;
+import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.router.Route;
 
 /**
@@ -103,9 +104,20 @@ public class MainView extends VerticalLayout {
         binder.forField(avatarField).bind("avatar");
 
         binder.forField(allowMarketingBox).bind("allowsMarketing");
-        binder.forField(emailField).bind("email");
+        // Here we use a Validator that extends one of the built-in ones.
+        // Note that we use 'asRequired(Validator)'; this method allows 'asRequired' to
+        // be conditional.
+        binder.forField(emailField).asRequired(new VisibilityEmailValidator("Value is not a valid email address")).bind("email");
+
         // Only ask for email address if the user wants marketing emails
-        allowMarketingBox.addValueChangeListener(e -> emailField.setVisible(allowMarketingBox.getValue()));
+        allowMarketingBox.addValueChangeListener(e -> {
+            emailField.setVisible(allowMarketingBox.getValue());
+            // Remove the input if the user decides not to allow emails. This way any input
+            // won't end up in the bean when saved.
+            if (!allowMarketingBox.getValue()) {
+                emailField.setValue("");
+            }
+        });
 
         // Another custom validator, this time for passwords
         binder.forField(passwordField1).asRequired().withValidator(this::passwordValidator).bind("password");
@@ -167,10 +179,7 @@ public class MainView extends VerticalLayout {
         Notification notification = Notification.show("Data saved, welcome " + detailsBean.getHandle());
         notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
 
-        // Here you'd typically redirect the user to another view, we'll just clear the
-        // form
-        binder.readBean(new UserDetails());
-        passwordField2.clear(); // this field isn't connected to the Binder so we manually clear it.
+        // Here you'd typically redirect the user to another view
     }
 
     /**
@@ -218,5 +227,31 @@ public class MainView extends VerticalLayout {
         }
 
         return ValidationResult.error(errorMsg);
+    }
+
+    /**
+     * Custom validator class that extends the built-in email validator.
+     * <p>
+     * Ths validator checks if the field is visible before performing the
+     * validation. This way, the validation is only performed when the user has told
+     * us they want marketing emails.
+     */
+    public static class VisibilityEmailValidator extends EmailValidator {
+
+        public VisibilityEmailValidator(String errorMessage) {
+            super(errorMessage);
+        }
+
+        @Override
+        public ValidationResult apply(String value, ValueContext context) {
+
+            if (!context.getComponent().get().isVisible()) {
+                // Component not visible, no validation
+                return ValidationResult.ok();
+            } else {
+                // normal email validation
+                return super.apply(value, context);
+            }
+        }
     }
 }
