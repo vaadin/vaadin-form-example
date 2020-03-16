@@ -56,6 +56,7 @@ public class MainView extends VerticalLayout {
 
         allowMarketingBox = new Checkbox("Allow Marketing?");
         EmailField emailField = new EmailField("Email");
+        emailField.setVisible(false);
 
         passwordField1 = new PasswordField("Wanted password");
         passwordField2 = new PasswordField("Password again");
