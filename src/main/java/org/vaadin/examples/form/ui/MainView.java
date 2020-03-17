@@ -68,9 +68,7 @@ public class MainView extends VerticalLayout {
         allowMarketingBox = new Checkbox("Allow Marketing?");
         allowMarketingBox.getStyle().set("padding-top", "10px");
         EmailField emailField = new EmailField("Email");
-        // We'll use 'visibility' instead of 'display:none' so that the form doesn't
-        // jump around when we hide/show the field
-        emailField.getStyle().set("visibility", "hidden");
+        emailField.setVisible(false);
 
         passwordField1 = new PasswordField("Wanted password");
         passwordField2 = new PasswordField("Password again");
@@ -154,7 +152,7 @@ public class MainView extends VerticalLayout {
         allowMarketingBox.addValueChangeListener(e -> {
 
             // show or hide depending on the checkbox
-            emailField.getStyle().set("visibility", allowMarketingBox.getValue() ? "visible" : "hidden");
+            emailField.setVisible(allowMarketingBox.getValue());
 
             // Additionally, remove the input if the user decides not to allow emails. This
             // way any input
