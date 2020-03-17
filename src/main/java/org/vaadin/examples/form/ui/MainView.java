@@ -65,6 +65,7 @@ public class MainView extends VerticalLayout {
 
         AvatarField avatarField = new AvatarField("Select Avatar image");
 
+        // We'll need these fields later on so let's store them as class variables
         allowMarketingBox = new Checkbox("Allow Marketing?");
         allowMarketingBox.getStyle().set("padding-top", "10px");
         EmailField emailField = new EmailField("Email");
