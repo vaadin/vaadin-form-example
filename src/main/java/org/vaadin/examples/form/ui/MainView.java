@@ -10,6 +10,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -55,6 +56,9 @@ public class MainView extends VerticalLayout {
         /*
          * Create the components we'll need
          */
+
+        H3 title = new H3("Signup form");
+
         TextField firstnameField = new TextField("First name");
         TextField lastnameField = new TextField("Last name");
         TextField handleField = new TextField("User handle");
@@ -62,6 +66,7 @@ public class MainView extends VerticalLayout {
         AvatarField avatarField = new AvatarField("Select Avatar image");
 
         allowMarketingBox = new Checkbox("Allow Marketing?");
+        allowMarketingBox.getStyle().set("padding-top", "10px");
         EmailField emailField = new EmailField("Email");
         // We'll use 'visibility' instead of 'display:none' so that the form doesn't
         // jump around when we hide/show the field
@@ -82,8 +87,8 @@ public class MainView extends VerticalLayout {
         // Create a FormLayout with all our components. The FormLayout doesn't have any
         // logic (validation, etc.), but it allows us to configure Responsiveness from
         // Java code and its defaults looks nicer than just using a VerticalLayout.
-        FormLayout formLayout = new FormLayout(firstnameField, lastnameField, handleField, avatarField, allowMarketingBox, emailField, passwordField1,
-                passwordField2, errorMessage, submitButton);
+        FormLayout formLayout = new FormLayout(title, firstnameField, lastnameField, handleField, avatarField, passwordField1, passwordField2,
+                allowMarketingBox, emailField, errorMessage, submitButton);
 
         // restrict maximum width and center on page
         formLayout.setMaxWidth("500px");
@@ -96,6 +101,7 @@ public class MainView extends VerticalLayout {
 
         // These components take full width regardless if we use one column or two (just
         // looks better that way)
+        formLayout.setColspan(title, 2);
         formLayout.setColspan(avatarField, 2);
         formLayout.setColspan(errorMessage, 2);
         formLayout.setColspan(submitButton, 2);
@@ -125,8 +131,12 @@ public class MainView extends VerticalLayout {
         binder.forField(firstnameField).asRequired().bind("firstname");
         binder.forField(lastnameField).asRequired().bind("lastname");
 
-        // The handle has a custom validator, in addition to being required
+        // The handle has a custom validator, in addition to being required. Some values
+        // are not allowed, such as 'admin'.
         binder.forField(handleField).withValidator(this::validateHandle).asRequired().bind("handle");
+
+        // Here we use our custom Vaadin component to handle the image portion of our
+        // data, since Vaadin can't do that for us.
 
         // Because the AvatarField is of type HasValue<AvatarImage>, the Binder can bind
         // it automatically. The avatar is not required and doesn't have a validator,
@@ -135,15 +145,20 @@ public class MainView extends VerticalLayout {
 
         binder.forField(allowMarketingBox).bind("allowsMarketing");
         // Here we use a Validator that extends one of the built-in ones.
-        // Note that we use 'asRequired(Validator)'; this method allows 'asRequired' to
+        // Note that we use 'asRequired(Validator)' instead of
+        // 'withValidator(Validator)'; this method allows 'asRequired' to
         // be conditional.
         binder.forField(emailField).asRequired(new VisibilityEmailValidator("Value is not a valid email address")).bind("email");
 
         // Only ask for email address if the user wants marketing emails
         allowMarketingBox.addValueChangeListener(e -> {
+
+            // show or hide depending on the checkbox
             emailField.getStyle().set("visibility", allowMarketingBox.getValue() ? "visible" : "hidden");
-            // Remove the input if the user decides not to allow emails. This way any input
-            // won't end up in the bean when saved.
+
+            // Additionally, remove the input if the user decides not to allow emails. This
+            // way any input
+            // that ends up hidden on the page won't end up in the bean when saved.
             if (!allowMarketingBox.getValue()) {
                 emailField.setValue("");
             }
@@ -158,7 +173,11 @@ public class MainView extends VerticalLayout {
         // The second field is not connected to the Binder, but we want the binder to
         // re-check the password validator when the field value changes.
         passwordField2.addValueChangeListener(e -> {
+
+            // The user has modified the second field, now we can validate and show errors.
+            // See passwordValidator() for how this flag is used,
             enablePasswordValidation = true;
+
             binder.validate();
         });
 
@@ -189,7 +208,7 @@ public class MainView extends VerticalLayout {
 
             } catch (ServiceException e2) {
 
-                // For same reason, the save failed in the back end.
+                // For some reason, the save failed in the back end.
 
                 // First, make sure we store the error in the server logs (preferably using a
                 // logging framework)

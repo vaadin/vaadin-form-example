@@ -5,6 +5,11 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
 
+/**
+ * Main Bean class that we build the form for.
+ * <p>
+ * Uses Bean Validation (JSR-303) anntations for automatic validation.
+ */
 public class UserDetails {
 
     private Long id;
@@ -27,6 +32,7 @@ public class UserDetails {
 
     // FIXME Passwords should never be stored in plain text!
     @NotNull
+    @Length(min = 8, max = 64)
     private String password;
 
     private boolean allowsMarketing;

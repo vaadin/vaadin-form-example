@@ -23,7 +23,7 @@ import com.vaadin.flow.server.StreamResource;
 public class AvatarField extends CustomField<AvatarImage> {
 
     /**
-     * We store any value here.
+     * We store the value here.
      */
     private AvatarImage value;
 
@@ -42,7 +42,7 @@ public class AvatarField extends CustomField<AvatarImage> {
 
     public AvatarField() {
 
-        // shows the current avatar
+        // <img> that shows the current avatar
         currentAvatar = new Image();
         currentAvatar.setAlt("avatar image");
         currentAvatar.setMaxHeight("100px");
@@ -74,44 +74,20 @@ public class AvatarField extends CustomField<AvatarImage> {
         add(wrapper);
     }
 
-    private void setFailed(String message) {
-        setInvalid(true);
-        setErrorMessage(message);
-    }
-
-    private void uploadSuccess(SucceededEvent e) {
-
-        value.setImage(outputStream.toByteArray());
-
-        // fire value changes
-        setModelValue(value, true);
-
-        updateImage();
-
-        // clear the upload component 'finished files' list for a cleaner appearance
-        // there is yet no API for it on the server side, see
-        // https://github.com/vaadin/vaadin-upload-flow/issues/96
-        upload.getElement().executeJs("this.files=[]");
-    }
-
-    /**
-     * Update avatar content or hide if empty
+    /*
+     * We need to implement this method so that this class works with the Binder.
+     * This method should return the current value.
      */
-    private void updateImage() {
-        if (value != null && value.getImage() != null) {
-            currentAvatar.setSrc(new StreamResource("avatar", () -> new ByteArrayInputStream(value.getImage())));
-            currentAvatar.setVisible(true);
-        } else {
-            currentAvatar.setSrc("");
-            currentAvatar.setVisible(false);
-        }
-    }
-
     @Override
     protected AvatarImage generateModelValue() {
         return value;
     }
 
+    /*
+     * We need to implement this method so that this class works with the Binder.
+     * This method should store the given value and update the visuals to the new
+     * value.
+     */
     @Override
     protected void setPresentationValue(AvatarImage newPresentationValue) {
 
@@ -122,14 +98,17 @@ public class AvatarField extends CustomField<AvatarImage> {
     }
 
     /**
-     * Called when a user initializes an upload
+     * Called when a user initializes an upload.
+     * <p>
+     * We prepare the bean and a destination for the binary data; Vaadin will take
+     * care of the actual network operations.
      */
     private OutputStream receiveUpload(String fileName, String mimeType) {
 
-        // clear errors
+        // clear errors for better user experience
         setInvalid(false);
 
-        // create new value bean
+        // create new value bean to store the data
         value = new AvatarImage();
         value.setName(fileName);
         value.setMime(mimeType);
@@ -139,4 +118,44 @@ public class AvatarField extends CustomField<AvatarImage> {
         return outputStream;
     }
 
+    /**
+     * Called when an upload is successfully completed.
+     */
+    private void uploadSuccess(SucceededEvent e) {
+
+        // store the binary data into our bean
+        value.setImage(outputStream.toByteArray());
+
+        // fire value changes
+        setModelValue(value, true);
+
+        // show the new image
+        updateImage();
+
+        // clear the upload component 'finished files' list for a cleaner appearance.
+        // there is yet no API for it on the server side, see
+        // https://github.com/vaadin/vaadin-upload-flow/issues/96
+        upload.getElement().executeJs("this.files=[]");
+    }
+
+    /**
+     * Shows an error message to the user.
+     */
+    private void setFailed(String message) {
+        setInvalid(true);
+        setErrorMessage(message);
+    }
+
+    /**
+     * Updates avatar image content or hide if empty
+     */
+    private void updateImage() {
+        if (value != null && value.getImage() != null) {
+            currentAvatar.setSrc(new StreamResource("avatar", () -> new ByteArrayInputStream(value.getImage())));
+            currentAvatar.setVisible(true);
+        } else {
+            currentAvatar.setSrc("");
+            currentAvatar.setVisible(false);
+        }
+    }
 }

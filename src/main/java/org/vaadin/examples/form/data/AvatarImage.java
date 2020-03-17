@@ -1,5 +1,8 @@
 package org.vaadin.examples.form.data;
 
+/**
+ * Class for holding data for an attachment file in this case an Image.
+ */
 public class AvatarImage {
 
     private byte[] image;

@@ -11,6 +11,11 @@ public class UserDetailsService implements Serializable {
 
     private String previousHandle;
 
+    /**
+     * 'Stores' the bean.
+     * <p>
+     * In reality it just throws ServiceException from time to time.
+     */
     public void store(UserDetails userDetails) throws ServiceException {
 
         // Here you can store the object into the DB, call REST services, etc.
@@ -18,7 +23,7 @@ public class UserDetailsService implements Serializable {
         // for demo purposes, always fail first try
         if (previousHandle == null || !previousHandle.equals(userDetails.getHandle())) {
             previousHandle = userDetails.getHandle();
-            throw new ServiceException();
+            throw new ServiceException("This exception simulates an error in the backend, and is intentional. Please try to submit the form again.");
         }
     }
 
@@ -49,6 +54,8 @@ public class UserDetailsService implements Serializable {
      * something went wrong during save.
      */
     public static class ServiceException extends Exception {
-
+        public ServiceException(String msg) {
+            super(msg);
+        }
     }
 }
