@@ -47,7 +47,7 @@ public class MainView extends VerticalLayout {
     private boolean enablePasswordValidation;
 
     /**
-     * We use Spring to inject the backend into our view.
+     * We use Spring to inject the backend into our view
      */
     public MainView(@Autowired UserDetailsService service) {
 
@@ -63,6 +63,9 @@ public class MainView extends VerticalLayout {
         TextField lastnameField = new TextField("Last name");
         TextField handleField = new TextField("User handle");
 
+        // This is a custom field we create to handle the field 'avatar' in our data. It
+        // work just as any other field, e.g. the TextFields above. Instead of a String
+        // value, it has an AvatarImage value.
         AvatarField avatarField = new AvatarField("Select Avatar image");
 
         // We'll need these fields later on so let's store them as class variables
@@ -89,17 +92,17 @@ public class MainView extends VerticalLayout {
         FormLayout formLayout = new FormLayout(title, firstnameField, lastnameField, handleField, avatarField, passwordField1, passwordField2,
                 allowMarketingBox, emailField, errorMessage, submitButton);
 
-        // restrict maximum width and center on page
+        // Restrict maximum width and center on page
         formLayout.setMaxWidth("500px");
         formLayout.getStyle().set("margin", "0 auto");
 
-        // allow the form layout to be responsive. On device widths 0-490px we have one
+        // Allow the form layout to be responsive. On device widths 0-490px we have one
         // column, then we have two. Field labels are always on top of the fields.
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP),
                 new FormLayout.ResponsiveStep("490px", 2, FormLayout.ResponsiveStep.LabelsPosition.TOP));
 
-        // These components take full width regardless if we use one column or two (just
-        // looks better that way)
+        // These components take full width regardless if we use one column or two (it
+        // just looks better that way)
         formLayout.setColspan(title, 2);
         formLayout.setColspan(avatarField, 2);
         formLayout.setColspan(errorMessage, 2);
@@ -109,7 +112,7 @@ public class MainView extends VerticalLayout {
         errorMessage.getStyle().set("color", "var(--lumo-error-text-color)");
         errorMessage.getStyle().set("padding", "15px 0");
 
-        // add the form to the page
+        // Add the form to the page
         add(formLayout);
 
         /*
@@ -131,22 +134,22 @@ public class MainView extends VerticalLayout {
         binder.forField(lastnameField).asRequired().bind("lastname");
 
         // The handle has a custom validator, in addition to being required. Some values
-        // are not allowed, such as 'admin'.
+        // are not allowed, such as 'admin'; this is checked in the validator.
         binder.forField(handleField).withValidator(this::validateHandle).asRequired().bind("handle");
 
         // Here we use our custom Vaadin component to handle the image portion of our
-        // data, since Vaadin can't do that for us.
-
-        // Because the AvatarField is of type HasValue<AvatarImage>, the Binder can bind
-        // it automatically. The avatar is not required and doesn't have a validator,
-        // but could.
+        // data, since Vaadin can't do that for us. Because the AvatarField is of type
+        // HasValue<AvatarImage>, the Binder can bind it automatically. The avatar is
+        // not required and doesn't have a validator, but could.
         binder.forField(avatarField).bind("avatar");
 
+        // Allow marketing is a simple checkbox
         binder.forField(allowMarketingBox).bind("allowsMarketing");
-        // Here we use a Validator that extends one of the built-in ones.
+        // EmailField uses a Validator that extends one of the built-in ones.
         // Note that we use 'asRequired(Validator)' instead of
         // 'withValidator(Validator)'; this method allows 'asRequired' to
-        // be conditional.
+        // be conditional instead of always on. We don't want to require the email if
+        // the user declines marketing messages.
         binder.forField(emailField).asRequired(new VisibilityEmailValidator("Value is not a valid email address")).bind("email");
 
         // Only ask for email address if the user wants marketing emails
@@ -156,8 +159,8 @@ public class MainView extends VerticalLayout {
             emailField.setVisible(allowMarketingBox.getValue());
 
             // Additionally, remove the input if the user decides not to allow emails. This
-            // way any input
-            // that ends up hidden on the page won't end up in the bean when saved.
+            // way any input that ends up hidden on the page won't end up in the bean when
+            // saved.
             if (!allowMarketingBox.getValue()) {
                 emailField.setValue("");
             }
@@ -170,11 +173,12 @@ public class MainView extends VerticalLayout {
         // validation.
 
         // The second field is not connected to the Binder, but we want the binder to
-        // re-check the password validator when the field value changes.
+        // re-check the password validator when the field value changes. The easiest way
+        // is just to do that manually.
         passwordField2.addValueChangeListener(e -> {
 
             // The user has modified the second field, now we can validate and show errors.
-            // See passwordValidator() for how this flag is used,
+            // See passwordValidator() for how this flag is used.
             enablePasswordValidation = true;
 
             binder.validate();
@@ -235,7 +239,7 @@ public class MainView extends VerticalLayout {
      * <p>
      * 1) Password is at least 8 characters long
      * <p>
-     * 2) Passwords in both field match each other
+     * 2) Values in both fields match each other
      */
     private ValidationResult passwordValidator(String pass1, ValueContext ctx) {
 

@@ -8,7 +8,7 @@ import org.hibernate.validator.constraints.Length;
 /**
  * Main Bean class that we build the form for.
  * <p>
- * Uses Bean Validation (JSR-303) anntations for automatic validation.
+ * Uses Bean Validation (JSR-303) annotations for automatic validation.
  */
 public class UserDetails {
 

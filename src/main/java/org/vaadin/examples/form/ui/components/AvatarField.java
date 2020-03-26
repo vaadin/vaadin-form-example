@@ -49,7 +49,7 @@ public class AvatarField extends CustomField<AvatarImage> {
         currentAvatar.getStyle().set("margin-right", "15px");
         currentAvatar.setVisible(false); // see updateImage()
 
-        // Create the upload component and delegate actions to the receiveUpload method
+        // create the upload component and delegate actions to the receiveUpload method
         upload = new Upload(this::receiveUpload);
         upload.getStyle().set("flex-grow", "1");
 
@@ -59,7 +59,7 @@ public class AvatarField extends CustomField<AvatarImage> {
         upload.addFailedListener(e -> setFailed(e.getReason().getMessage()));
         upload.addFileRejectedListener(e -> setFailed(e.getErrorMessage()));
 
-        // Only allow images to be uploaded
+        // only allow images to be uploaded
         upload.setAcceptedFileTypes("image/*");
 
         // only allow single file at a time
@@ -68,6 +68,7 @@ public class AvatarField extends CustomField<AvatarImage> {
         // set max file size to 1 MB
         upload.setMaxFileSize(1 * 1024 * 1024);
 
+        // component layouting
         Div wrapper = new Div();
         wrapper.add(currentAvatar, upload);
         wrapper.getStyle().set("display", "flex");
@@ -90,9 +91,6 @@ public class AvatarField extends CustomField<AvatarImage> {
      */
     @Override
     protected void setPresentationValue(AvatarImage newPresentationValue) {
-
-        // Called when something external calls setValue() on this component. Store
-        // value and refresh.
         value = newPresentationValue;
         updateImage();
     }
@@ -105,7 +103,7 @@ public class AvatarField extends CustomField<AvatarImage> {
      */
     private OutputStream receiveUpload(String fileName, String mimeType) {
 
-        // clear errors for better user experience
+        // clear old errors for better user experience
         setInvalid(false);
 
         // create new value bean to store the data
@@ -126,7 +124,7 @@ public class AvatarField extends CustomField<AvatarImage> {
         // store the binary data into our bean
         value.setImage(outputStream.toByteArray());
 
-        // fire value changes
+        // fire value changes so that Binder can do its thing
         setModelValue(value, true);
 
         // show the new image
