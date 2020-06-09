@@ -9,3 +9,5 @@ webpack.config.js
 .DS_Store
 /package-lock.json
 /package.json
+/pnpm-lock.yaml
+/pnpmfile.js
