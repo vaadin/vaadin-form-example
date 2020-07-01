@@ -10,7 +10,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -57,7 +57,7 @@ public class MainView extends VerticalLayout {
          * Create the components we'll need
          */
 
-        H3 title = new H3("Signup form");
+        H2 title = new H2("Signup form");
 
         TextField firstnameField = new TextField("First name");
         TextField lastnameField = new TextField("Last name");
