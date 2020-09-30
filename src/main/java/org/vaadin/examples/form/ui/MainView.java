@@ -6,6 +6,7 @@ import org.vaadin.examples.form.data.UserDetailsService;
 import org.vaadin.examples.form.data.UserDetailsService.ServiceException;
 import org.vaadin.examples.form.ui.components.AvatarField;
 
+import com.vaadin.example.corner.VaadinCorner;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -222,6 +223,7 @@ public class MainView extends VerticalLayout {
             }
         });
 
+        add(new VaadinCorner());
     }
 
     /**
