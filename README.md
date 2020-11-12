@@ -2,7 +2,7 @@
 
 This project demonstrates how to create a more complex form using the Vaadin 14+ Java API (Binder). The form code can be found in MainView.java. In addition, AvatarField.java has an implementation of a custom field.
 
-[![Vaadin 14 Form Example](form-example.png)](https://labs.vaadin.com/form-example/)
+[![Vaadin 14 Form Example](form-example.png)](https://vaadin-form-example.demo.vaadin.com/)
 
 The idea behind this example is to demonstrate various features of the Vaadin Binder, including data binding, automatic validation, error handling, and custom data type handling.
 
