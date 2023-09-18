@@ -13,7 +13,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
 
-        <vaadin.version>24.1.9</vaadin.version>
+        <vaadin.version>24.1.10</vaadin.version>
     </properties>
 
     <parent>
