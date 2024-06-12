@@ -12,4 +12,4 @@ webpack.config.js
 /package.json
 /pnpm-lock.yaml
 /pnpmfile.js
-frontend/generated/
+src/main/frontend/generated/
