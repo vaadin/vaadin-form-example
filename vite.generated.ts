@@ -142,6 +142,7 @@ function buildSWPlugin(opts: { devMode: boolean }): PluginOption {
           sourcemap: viteConfig.command === 'serve' || viteConfig.build.sourcemap,
           emptyOutDir: false,
           modulePreload: false,
+          target: ['safari15', 'es2022'],
           rollupOptions: {
             input: {
               sw: settings.clientServiceWorkerSource
@@ -697,6 +698,7 @@ export const vaadinConfig: UserConfigFn = (env) => {
       outDir: buildOutputFolder,
       emptyOutDir: devBundle,
       assetsDir: 'VAADIN/build',
+      target: ['safari15', 'es2022'],
       rollupOptions: {
         input: {
           indexhtml: projectIndexHtml,
@@ -755,7 +757,16 @@ export const vaadinConfig: UserConfigFn = (env) => {
         babel: {
           // We need to use babel to provide the source information for it to be correct
           // (otherwise Babel will slightly rewrite the source file and esbuild generate source info for the modified file)
-          presets: [['@babel/preset-react', { runtime: 'automatic', development: !productionMode }]],
+          presets: [
+            [
+              '@babel/preset-react',
+              {
+                runtime: 'automatic',
+                importSource: productionMode ? 'react' : 'Frontend/generated/jsx-dev-transform',
+                development: !productionMode
+              }
+            ]
+          ],
           // React writes the source location for where components are used, this writes for where they are defined
           plugins: [
             !productionMode && addFunctionComponentSourceLocationBabel(),
