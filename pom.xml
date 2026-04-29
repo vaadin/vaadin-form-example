@@ -13,13 +13,13 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
 
-        <vaadin.version>25.1.3</vaadin.version>
+        <vaadin.version>25.1.4</vaadin.version>
     </properties>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.5</version>
+        <version>4.0.6</version>
     </parent>
 
     <repositories>
